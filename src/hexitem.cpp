@@ -27,10 +27,13 @@ const char* HexMaterialShader::fragmentShader() const
 {
 	return "uniform lowp float qt_Opacity;                             \n"
 		   "uniform lowp vec4 color;                                   \n"
+		   "uniform highp float time;                                  \n"
 		   "varying highp vec2 texCoord;                               \n"
 		   "void main ()                                               \n"
 		   "{                                                          \n"
-		   "    gl_FragColor = texCoord.y * texCoord.x * color * qt_Opacity;  \n"
+			"float mo = sin(time);"
+		   "    gl_FragColor = mo * texCoord.x * color * qt_Opacity;  \n"
+		   "    gl_FragColor = vec4(mo) * qt_Opacity;  \n"
 		   "}";
 }
 
@@ -43,9 +46,15 @@ QList<QByteArray> HexMaterialShader::attributes() const
 void HexMaterialShader::updateState(const State* state, const State*)
 {
 	program()->setUniformValue(id_color, state->color);
+	program()->setUniformValue(id_time, state->time);
+//	program()->setUniformValue(id_time, (GLfloat)static_cast<QSGSimpleMaterial<dwFxWaterMaterialState>*>(newMaterial)->state()->time);
 }
 
-void HexMaterialShader::resolveUniforms() { id_color = program()->uniformLocation("color"); }
+void HexMaterialShader::resolveUniforms()
+{
+	id_color = program()->uniformLocation("color");
+	id_time = program()->uniformLocation("time");
+}
 
 HexNode::HexNode()
 	: m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4)
@@ -77,6 +86,7 @@ QSGNode* HexItem::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData
 
 	QSGGeometry::updateTexturedRectGeometry(n->geometry(), boundingRect(), QRectF(0, 0, 1, 1));
 	static_cast<QSGSimpleMaterial<State>*>(n->material())->state()->color = m_color;
+	static_cast<QSGSimpleMaterial<State>*>(n->material())->state()->time = m_time;
 
 	n->markDirty(QSGNode::DirtyGeometry | QSGNode::DirtyMaterial);
 

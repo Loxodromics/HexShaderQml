@@ -19,6 +19,7 @@ namespace LFD {
 
 struct State {
 	QColor color;
+	float time;
 
 	int compare(const State* other) const
 	{
@@ -56,6 +57,7 @@ public:
 
 private:
 	int id_color;
+	int id_time;
 };
 
 ///
@@ -89,6 +91,7 @@ signals:
 
 private:
 	QColor m_color;
+	qreal m_time;
 
 public:
 	QSGNode* updatePaintNode(QSGNode* node, UpdatePaintNodeData*) override;
